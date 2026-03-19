@@ -1,17 +1,17 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-
 export async function POST(
-  request: Request,
-  { params }: { params: { clientId: string } }
+  request: NextRequest,
+  context: { params: Promise<{ clientId: string }> }
 ) {
   try {
+    const { clientId } = await context.params // ← вот это важно!
     const body = await request.json()
     
     const contact = await prisma.contactLog.create({
       data: {
-        clientId: params.clientId,
+        clientId: clientId,
         contactType: body.contactType,
         summary: body.summary,
         fullNote: body.fullNote,
@@ -20,9 +20,8 @@ export async function POST(
       }
     })
 
-  
     await prisma.client.update({
-      where: { id: params.clientId },
+      where: { id: clientId },
       data: { lastContactAt: new Date() }
     })
 
