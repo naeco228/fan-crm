@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma'  
+import { prisma } from '@/lib/prisma'
 import { ReminderBoard } from '@/components/ReminderBoard'
 
 export default async function RemindersPage() {
@@ -17,10 +17,18 @@ export default async function RemindersPage() {
     }
   })
 
+ 
+  const remindersForBoard = reminders.map(reminder => ({
+    ...reminder,
+    dueAt: reminder.dueAt.toISOString(),
+    createdAt: reminder.createdAt.toISOString(),
+    updatedAt: reminder.updatedAt.toISOString(),
+  }))
+
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-bold mb-8">Напоминания</h1>
-      <ReminderBoard reminders={reminders} />
+      <ReminderBoard reminders={remindersForBoard} />
     </div>
   )
 }
