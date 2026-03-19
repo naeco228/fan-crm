@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-// POST /api/clients/[id]/contacts — добавить контакт
+
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { clientId: string } }
 ) {
   try {
     const body = await request.json()
     
     const contact = await prisma.contactLog.create({
       data: {
-        clientId: params.id,
+        clientId: params.clientId,
         contactType: body.contactType,
         summary: body.summary,
         fullNote: body.fullNote,
@@ -20,7 +20,7 @@ export async function POST(
       }
     })
 
-    // Обновляем lastContactAt у клиента
+  
     await prisma.client.update({
       where: { id: params.clientId },
       data: { lastContactAt: new Date() }
