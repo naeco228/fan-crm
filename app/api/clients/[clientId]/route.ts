@@ -1,14 +1,16 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 
 export async function GET(
-  request: Request,
-  const { clientId } = await context.params
+  request: NextRequest,
+  context: { params: Promise<{ clientId: string }> }
 ) {
   try {
+    const { clientId } = await context.params
+
     const client = await prisma.client.findUnique({
-      where: { id: params.clientId },
+      where: { id: clientId },
       include: {
         contactLogs: {
           orderBy: {
@@ -38,6 +40,7 @@ export async function GET(
 
     return NextResponse.json(client)
   } catch (error) {
+    console.error('GET error:', error)
     return NextResponse.json(
       { error: 'Ошибка при получении клиента' },
       { status: 500 }
@@ -47,19 +50,21 @@ export async function GET(
 
 
 export async function PATCH(
-  request: Request,
-  const { clientId } = await context.params
+  request: NextRequest,
+  context: { params: Promise<{ clientId: string }> }
 ) {
   try {
+    const { clientId } = await context.params
     const body = await request.json()
     
     const client = await prisma.client.update({
-      where: { id: params.clientId },
+      where: { id: clientId },
       data: body
     })
 
     return NextResponse.json(client)
   } catch (error) {
+    console.error('PATCH error:', error)
     return NextResponse.json(
       { error: 'Ошибка при обновлении клиента' },
       { status: 500 }
