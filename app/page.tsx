@@ -2,7 +2,6 @@ import { prisma } from '@/lib/prisma'
 import { Dashboard } from '@/components/Dashboard'
 
 export default async function DashboardPage() {
-  // Получаем статистику напрямую из БД (можно и через API, но так проще)
   const totalClients = await prisma.client.count()
   
   const vipClients = await prisma.client.count({
@@ -53,13 +52,20 @@ export default async function DashboardPage() {
     }
   })
 
+  
+  const recentClientsForDashboard = recentClients.map(client => ({
+    ...client,
+    createdAt: client.createdAt.toISOString(),
+    
+  }))
+
   const stats = {
     totalClients,
     vipClients,
     inactiveClients,
     todayReminders,
     overdueReminders,
-    recentClients
+    recentClients: recentClientsForDashboard
   }
 
   return <Dashboard stats={stats} />
