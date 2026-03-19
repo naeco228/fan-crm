@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-// POST /api/clients/[id]/reminders — создать напоминание
+
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { clientId: string } }
 ) {
   try {
     const body = await request.json()
@@ -26,10 +26,10 @@ export async function POST(
   }
 }
 
-// PATCH /api/clients/[id]/reminders/[reminderId] — отметить выполненным
+
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string; reminderId: string } }
+  { params }: { params: { clientId: string; reminderId: string } }
 ) {
   try {
     const reminder = await prisma.reminder.update({

@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-// GET /api/clients/[id] — получить одного клиента с его контактами и напоминаниями
+
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const client = await prisma.client.findUnique({
-      where: { id: params.id },
+      where: { id: params.clientId },
       include: {
         contactLogs: {
           orderBy: {
@@ -45,16 +45,16 @@ export async function GET(
   }
 }
 
-// PATCH /api/clients/[id] — обновить клиента
+
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { clientId: string } }
 ) {
   try {
     const body = await request.json()
     
     const client = await prisma.client.update({
-      where: { id: params.id },
+      where: { id: params.clientId },
       data: body
     })
 
