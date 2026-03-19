@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Client {
+  id             String    @id @default(cuid())
+  displayName    String
+  platform       String?
+  username       String?
+  country        String?
+  language       String?
+  interests      String?
+  notes          String?
+  status         String?
+  totalSpent     Float     @default(0)
+  lastContactAt  DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  contactLogs    ContactLog[]
+  reminders      Reminder[]
+  tags           ClientTag[]
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  clients   ClientTag[]
+}
+
+model ClientTag {
+  client    Client @relation(fields: [clientId], references: [id])
+  clientId  String
+  tag       Tag    @relation(fields: [tagId], references: [id])
+  tagId     String
+
+  @@id([clientId, tagId])
+}
+
+model ContactLog {
+  id              String   @id @default(cuid())
+  client          Client   @relation(fields: [clientId], references: [id])
+  clientId        String
+  contactType     String
+  summary         String
+  fullNote        String?
+  contactedAt     DateTime
+  nextFollowUpAt  DateTime?
+  createdAt       DateTime @default(now())
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  client    Client   @relation(fields: [clientId], references: [id])
+  clientId  String
+  title     String
+  dueAt     DateTime
+  done      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

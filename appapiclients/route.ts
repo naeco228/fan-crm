@@ -1,0 +1,55 @@
+import { NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
+// GET /api/clients — получить всех клиентов
+export async function GET() {
+  try {
+    const clients = await prisma.client.findMany({
+      include: {
+        tags: {
+          include: {
+            tag: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      }
+    })
+    
+    return NextResponse.json(clients)
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Ошибка при получении клиентов' },
+      { status: 500 }
+    )
+  }
+}
+
+// POST /api/clients — создать нового клиента
+export async function POST(request: Request) {
+  try {
+    const body = await request.json()
+    
+    const client = await prisma.client.create({
+      data: {
+        displayName: body.displayName,
+        platform: body.platform || null,
+        username: body.username || null,
+        country: body.country || null,
+        language: body.language || null,
+        interests: body.interests || null,
+        notes: body.notes || null,
+        status: body.status || 'active',
+        totalSpent: body.totalSpent || 0,
+      }
+    })
+    
+    return NextResponse.json(client)
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Ошибка при создании клиента' },
+      { status: 500 }
+    )
+  }
+}
