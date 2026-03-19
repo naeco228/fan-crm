@@ -1,7 +1,33 @@
-import NextAuth from "next-auth"
+import NextAuth, { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import { JWT } from "next-auth/jwt"
 
-const handler = NextAuth({
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string
+      name?: string | null
+      email?: string | null
+      image?: string | null
+    }
+  }
+  
+  interface User {
+    id: string
+    name?: string | null
+    email?: string | null
+    image?: string | null
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string
+  }
+}
+
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "credentials",
@@ -10,7 +36,6 @@ const handler = NextAuth({
         password: { label: "Пароль", type: "password" }
       },
       async authorize(credentials) {
-        // Проверяем credentials с переменными окружения
         if (
           credentials?.email === process.env.ADMIN_EMAIL &&
           credentials?.password === process.env.ADMIN_PASSWORD
@@ -26,7 +51,7 @@ const handler = NextAuth({
     })
   ],
   pages: {
-    signIn: "/login", // кастомная страница логина
+    signIn: "/login",
   },
   session: {
     strategy: "jwt",
@@ -40,11 +65,13 @@ const handler = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string
+        session.user.id = token.id
       }
       return session
     }
   }
-})
+}
+
+const handler = NextAuth(authOptions)
 
 export { handler as GET, handler as POST }
