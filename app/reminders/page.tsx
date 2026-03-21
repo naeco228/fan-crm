@@ -1,22 +1,3 @@
-import { prisma } from '@/lib/prisma'
-import { ReminderBoard } from '@/components/ReminderBoard'
-
-export default async function RemindersPage() {
-  const reminders = await prisma.reminder.findMany({
-    where: { done: false },
-    include: {
-      client: {
-        select: {
-          id: true,
-          displayName: true
-        }
-      }
-    },
-    orderBy: {
-      dueAt: 'asc'
-    }
-  })
-
 import { ReminderBoard } from '@/components/ReminderBoard'
 
 export default async function RemindersPage() {
