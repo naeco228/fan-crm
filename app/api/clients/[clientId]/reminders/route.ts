@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 
-export async function POST(
+// УДАЛЯЕМ POST НАХРЕН, ЕСЛИ ОН НЕ НУЖЕН
+// Оставляем только PATCH
+
+export async function PATCH(
   request: NextRequest,
-  context: { params: Promise<{ clientId: string }> }
+  context: { params: Promise<{ reminderId: string }> }
 ) {
   try {
-    const { clientId } = await context.params
+    const { reminderId } = await context.params
     const body = await request.json()
     
-    // Временно возвращаем заглушку, чтобы билд прошёл
     return NextResponse.json({ 
-      id: 'temp-id', 
-      clientId,
+      id: reminderId,
+      done: body.done,
       message: 'Temporary response' 
     })
   } catch (error) {
@@ -22,3 +23,6 @@ export async function POST(
     )
   }
 }
+
+// ЕСЛИ POST ВООБЩЕ НЕ ИСПОЛЬЗУЕТСЯ — УДАЛИ ЕГО ПОЛНОСТЬЮ
+// export async function POST(...) { ... } // <-- УДАЛИ ЭТУ ФУНКЦИЮ
