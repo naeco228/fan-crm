@@ -57,7 +57,7 @@ export default function LoginPage() {
                 name="email"
                 type="email"
                 required
-                placeholder="friend@example.com"
+                placeholder="admin@example.com"
               />
             </div>
             <div>
