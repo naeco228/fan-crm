@@ -20,7 +20,6 @@ export default async function RemindersPage() {
 import { ReminderBoard } from '@/components/ReminderBoard'
 
 export default async function RemindersPage() {
-  // Временный пустой массив
   const reminders = []
 
   return (

@@ -1,7 +1,6 @@
 import { Dashboard } from '@/components/Dashboard'
 
 export default async function DashboardPage() {
-  // Временная статика
   const stats = {
     totalClients: 0,
     vipClients: 0,

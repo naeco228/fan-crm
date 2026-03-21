@@ -1,7 +1,6 @@
 import { ClientList } from '@/components/ClientList'
 
 export default async function ClientsPage() {
-  // Временно возвращаем пустой массив, пока не настроим БД
   const clients = []
   
   return (
