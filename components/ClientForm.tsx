@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Select,
   SelectContent,
@@ -12,8 +13,22 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-export function ClientForm({ onClientAdded }: { onClientAdded: (client: any) => void }) {
+const AVAILABLE_TAGS = [
+  { id: 'vip', name: 'VIP' },
+  { id: 'warm', name: 'Warm' },
+  { id: 'inactive', name: 'Inactive' },
+  { id: 'gamer', name: 'Gamer' },
+  { id: 'gym', name: 'Gym' },
+  { id: 'talkative', name: 'Talkative' },
+]
+
+interface ClientFormProps {
+  onClientAdded: (client: any) => void
+}
+
+export function ClientForm({ onClientAdded }: ClientFormProps) {
   const [loading, setLoading] = useState(false)
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [formData, setFormData] = useState({
     displayName: '',
     platform: '',
@@ -39,8 +54,17 @@ export function ClientForm({ onClientAdded }: { onClientAdded: (client: any) => 
 
       if (res.ok) {
         const newClient = await res.json()
+        
+        // Добавляем теги после создания клиента
+        for (const tagId of selectedTags) {
+          await fetch(`/api/clients/${newClient.id}/tags`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tagId, action: 'add' })
+          })
+        }
+        
         onClientAdded(newClient)
-        // Очистить форму
         setFormData({
           displayName: '',
           platform: '',
@@ -52,6 +76,7 @@ export function ClientForm({ onClientAdded }: { onClientAdded: (client: any) => 
           status: 'active',
           totalSpent: 0,
         })
+        setSelectedTags([])
       }
     } catch (error) {
       console.error('Ошибка:', error)
@@ -128,6 +153,31 @@ export function ClientForm({ onClientAdded }: { onClientAdded: (client: any) => 
         />
       </div>
 
+      {/* Теги */}
+      <div>
+        <Label>Теги</Label>
+        <div className="flex flex-wrap gap-3 mt-2">
+          {AVAILABLE_TAGS.map(tag => (
+            <div key={tag.id} className="flex items-center space-x-2">
+              <Checkbox
+                id={`tag-${tag.id}`}
+                checked={selectedTags.includes(tag.id)}
+                onCheckedChange={(checked) => {
+                  if (checked) {
+                    setSelectedTags([...selectedTags, tag.id])
+                  } else {
+                    setSelectedTags(selectedTags.filter(t => t !== tag.id))
+                  }
+                }}
+              />
+              <Label htmlFor={`tag-${tag.id}`} className="text-sm cursor-pointer">
+                {tag.name}
+              </Label>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div>
         <Label htmlFor="status">Статус</Label>
         <Select
@@ -145,20 +195,20 @@ export function ClientForm({ onClientAdded }: { onClientAdded: (client: any) => 
         </Select>
       </div>
 
-     <div>
-  <Label htmlFor="totalSpent">Потрачено всего ($)</Label>
-  <Input
-    id="totalSpent"
-    type="number"
-    step="0.01"
-    min="0"
-    value={formData.totalSpent}
-    onChange={(e) => {
-      const value = e.target.value === '' ? 0 : parseFloat(e.target.value)
-      setFormData({ ...formData, totalSpent: value })
-    }}
-  />
-</div>
+      <div>
+        <Label htmlFor="totalSpent">Потрачено всего ($)</Label>
+        <Input
+          id="totalSpent"
+          type="number"
+          step="0.01"
+          min="0"
+          value={formData.totalSpent}
+          onChange={(e) => {
+            const value = e.target.value === '' ? 0 : parseFloat(e.target.value)
+            setFormData({ ...formData, totalSpent: value })
+          }}
+        />
+      </div>
 
       <Button type="submit" disabled={loading}>
         {loading ? 'Сохранение...' : 'Создать клиента'}
